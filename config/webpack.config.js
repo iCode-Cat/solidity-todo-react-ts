@@ -1,5 +1,4 @@
 'use strict';
-const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const fs = require('fs');
 const path = require('path');
 const webpack = require('webpack');
@@ -761,8 +760,3 @@ try {
 } catch (ex) {
   module.exports = config;
 }
-
-module.exports = {
-  // Other rules...
-  plugins: [new NodePolyfillPlugin()],
-};

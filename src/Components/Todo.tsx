@@ -21,9 +21,18 @@ interface TodoProps {
   todo: string;
   id: any;
   updateTodoStatus: (status: boolean, id: string) => void;
+  removeTodo: (id: number) => void;
+  index: number;
 }
 
-const Todo = ({ todo, completed, id, updateTodoStatus }: TodoProps) => {
+const Todo = ({
+  todo,
+  completed,
+  id,
+  updateTodoStatus,
+  removeTodo,
+  index,
+}: TodoProps) => {
   const theme = useContext(ThemeContext);
 
   const statusHandler = () => {
@@ -51,6 +60,7 @@ const Todo = ({ todo, completed, id, updateTodoStatus }: TodoProps) => {
         <img
           src={theme.mode === 'light' ? '/close-light.svg' : '/close-dark.svg'}
           alt='icon'
+          onClick={() => removeTodo(index)}
         />
       </Column>
     </Wrapper>

@@ -19,6 +19,7 @@ const Wrapper = styled.div`
 interface ITodos {
   todos: ITodo[];
   updateTodoStatus: (status: boolean, id: string) => void;
+  removeTodo: (id: number) => void;
 }
 
 export interface ITodo {
@@ -28,18 +29,20 @@ export interface ITodo {
   owner?: string;
 }
 
-const Todos = ({ todos, updateTodoStatus }: ITodos) => {
+const Todos = ({ todos, updateTodoStatus, removeTodo }: ITodos) => {
   const theme = useContext(ThemeContext);
 
   return (
     <Wrapper theme={theme}>
-      {todos.map((a) => (
+      {todos.map((a, index) => (
         <Todo
           key={a.id}
           updateTodoStatus={updateTodoStatus}
+          removeTodo={removeTodo}
           todo={a.todo}
           completed={a.completed}
           id={a.id}
+          index={index}
         />
       ))}
     </Wrapper>

@@ -41,7 +41,7 @@ function App() {
   };
 
   // WEB3 settings
-  const contractAddress = '0x5A0fD4E4F84EA9a3f45Bc3bE28796579B9144795';
+  const contractAddress = '0xAE8F0d29128d432900F5112b044602f80cb67542';
   const contractABI = abi.abi;
 
   const connectWallet = async () => {
@@ -70,6 +70,32 @@ function App() {
     });
   };
 
+  const removeTodo = async (index: number) => {
+    const { ethereum } = window;
+    if (!ethereum) {
+      console.log('Make sure you have metamask!');
+    } else {
+      console.log('We have the ethereum object', ethereum);
+    }
+
+    try {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      const removeItem = await contract.removeTodo(index);
+      await removeItem.wait();
+      console.log('Removed item', removeItem);
+      handleNewNotification('Item removed.');
+      setTodos([]);
+    } catch (error) {
+      console.log('error');
+    }
+  };
+
   const getTodos = async () => {
     const { ethereum } = window;
     if (!ethereum) {
@@ -78,27 +104,36 @@ function App() {
       console.log('We have the ethereum object', ethereum);
     }
 
-    const provider = new ethers.providers.Web3Provider(ethereum);
-    const signer = provider.getSigner();
-    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-    const todos = await contract.getTodos();
-    setInit(true);
-    setTodos([]);
-    todos.forEach((arr: any) => {
-      if (Number(arr.owner) === Number(currentAccount)) {
-        setTodos((prev) => [
-          ...prev,
-          {
-            completed: arr.completed,
-            id: ethers.BigNumber.from(arr.id).toString(),
-            todo: arr.todo,
-            owner: arr.owner,
-          },
-        ]);
+    try {
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      const todos = await contract.getTodos();
+      setInit(true);
+      setTodos([]);
+      todos.forEach((arr: any, index: any) => {
+        console.log(index);
+        if (Number(arr.owner) === Number(currentAccount)) {
+          setTodos((prev) => [
+            ...prev,
+            {
+              completed: arr.completed,
+              id: ethers.BigNumber.from(arr.id).toString(),
+              todo: arr.todo,
+              owner: arr.owner,
+            },
+          ]);
+        }
+      });
+      if (!init) {
+        handleNewNotification('Todos fetched');
       }
-    });
-    if (!init) {
-      handleNewNotification('Todos fetched');
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -178,7 +213,11 @@ function App() {
           <Header />
           <div className='todo-wrapper global-pd'>
             <Input addTodo={addTodo} />
-            <Todos updateTodoStatus={updateTodoStatus} todos={todos} />
+            <Todos
+              updateTodoStatus={updateTodoStatus}
+              todos={todos}
+              removeTodo={removeTodo}
+            />
           </div>
         </Wrapper>
       </HandleTheme.Provider>
